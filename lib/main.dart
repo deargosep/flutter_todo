@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
-
+import 'data_screen.dart';
 
 void main() {
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_)=> Noter())
-  ],
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => Noter())],
     child: MyApp(),
   ));
 }
 
 class Noter with ChangeNotifier, DiagnosticableTreeMixin {
   List notes = ['Provider used!'];
+
   void add(value) {
     notes.add(value);
     notifyListeners();
   }
+
   void clear() {
     notes.clear();
     notifyListeners();
@@ -39,7 +40,9 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(title: Text('Notes')),
         body: SingleChildScrollView(
           child: Column(
-            children: [AddNote(), NotesList()],
+            children: [AddNote(), NotesList(), ElevatedButton(onPressed: () {
+              Navigator.push(context,MaterialPageRoute(builder: (context) => DataScreen()));
+            }, child: Text('Get data!'))],
           ),
         ));
   }
@@ -56,14 +59,16 @@ class AddNote extends StatelessWidget {
         children: [
           Text('Add a note'),
           TextField(
-            onEditingComplete: (){
+            onEditingComplete: () {
               context.read<Noter>().add(textEditingController.text);
             },
             controller: textEditingController,
           ),
-          ElevatedButton(onPressed: () {
-            context.read<Noter>().add(textEditingController.text);
-          }, child: Text('Add'))
+          ElevatedButton(
+              onPressed: () {
+                context.read<Noter>().add(textEditingController.text);
+              },
+              child: Text('Add'))
         ],
       ),
     );
@@ -83,12 +88,14 @@ class NotesList extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (BuildContext context, int index) {
-            return Text('${context.watch<Noter>().notes[index]}');
+            return Card(child: Text('${context.watch<Noter>().notes[index]}'));
           },
         ),
-        ElevatedButton(onPressed: () {
-          context.read<Noter>().clear();
-        }, child: Text('Clean'))
+        ElevatedButton(
+            onPressed: () {
+              context.read<Noter>().clear();
+            },
+            child: Text('Clean'))
       ],
     );
   }
